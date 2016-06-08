@@ -90,6 +90,9 @@
 		allowGoogleAnalyticsEventLog : false,
 		gooleAnalyticsFunctionName : 'ga',
 
+        //to allow the user to edit fields
+        editable : {},
+
 		//enable triggering of user function on quantity change
 		userFunctionNameOnQuantityChange: null,
 
@@ -373,6 +376,28 @@
 			settings['valueServingUnitQuantity'] = 0;
 		}
 
+        if (settings['editable'] == true) {
+            settings['editable'] = [
+                'itemName','valueServingUnitQuantity','valueCalories','valueFatCalories','valueTotalFat','valueSatFat','valueTransFat','valuePolyFat','valueMonoFat',
+                'valueCholesterol','valueSodium','valuePotassium','valueTotalCarb','valueFibers','valueSugars','valueProteins',
+                'valueVitaminA','valueVitaminC','valueCalcium','valueIron'
+            ];
+        }
+
+        if (settings['editable'] instanceof Array) {
+            var editable = {};
+
+            $.each(settings['editable'], function(index, value) {
+                editable[value] = value;
+            });
+
+            settings['editable'] = editable;
+        }
+
+        if (!settings['editable'] instanceof Object) {
+            settings['editable'] = {};
+        }
+
 		return settings;
 	}
 
@@ -510,6 +535,15 @@
 			});
 		}
 
+        //any editable field is changed
+        for(var value in $settings.editable) {
+            $('#' + $elem.attr('id') ).delegate('input[name="' + $settings.editable[value] +'"]', 'change', function(e){
+                e.preventDefault();
+                changeValue($(this), nutritionLabel, $elem);
+
+            });
+        }
+
 		//store the object for later reference
 		$elem.data('_nutritionLabel', nutritionLabel);
 	}
@@ -597,6 +631,12 @@
 			});
 		}
 	}
+
+    function changeValue($thisTextbox, nutritionLabel, $elem){
+        var value = parseFloat( $thisTextbox.val() );
+        // TODO: update % DV when values change
+        // TODO: constrain values to rounding rules
+    }
 
 
 	function changeQuantityTextbox($thisTextbox, $originalSettings, nutritionLabel, $elem){
@@ -1021,7 +1061,7 @@
 									parseFloat(
 										$this.settings.valueServingUnitQuantity.toFixed($this.settings.decimalPlacesForQuantityTextbox)
 									) + '" ';
-								nutritionLabel += 'class="' + textboxClass + '">\n';
+								nutritionLabel += 'class="' + textboxClass + '" name="' + $this.settings.editable['valueServingUnitQuantity'] + '">\n';
 
 							nutritionLabel += tab3 + '<input type="hidden" value="' +
 									parseFloat(
@@ -1035,8 +1075,12 @@
 					}
 				}//end of => if ($this.settings.showServingUnitQuantityTextbox){
 
+                var editable = 'itemName' in $this.settings.editable;
+
 					nutritionLabel += tabTemp + '<div class="name ' + itemNameClass + '">';
+                    nutritionLabel += editable ? '<input class="value" name="' + $this.settings.editable['itemName'] + '" value="' : '';
 						nutritionLabel += $this.settings.itemName;
+                    nutritionLabel += editable ? '">' : '';
 					if ($this.settings.showBrandName && $this.settings.brandName != null && $this.settings.brandName != ''){
 						nutritionLabel += ' - ' + $this.settings.brandName;
 					}
@@ -1098,7 +1142,7 @@
 										parseFloat(
 											$this.settings.valueServingUnitQuantity.toFixed($this.settings.decimalPlacesForQuantityTextbox)
 										) + '" ';
-									nutritionLabel += 'class="' + textboxClass + '">\n';
+									nutritionLabel += 'class="' + textboxClass + '" name="' + $this.settings.editable['valueServingUnitQuantity'] + '">\n';
 
 								nutritionLabel += tab4 + '<input type="hidden" value="' +
 										parseFloat(
@@ -1176,28 +1220,44 @@
 
 
 				if ($this.settings.showFatCalories){
+                    var editable = 'valueFatCalories' in $this.settings.editable;
 					nutritionLabel += tab2 + '<div class="fr">';
 						nutritionLabel += $this.settings.textFatCalories + ' ';
 						nutritionLabel += $this.settings.naFatCalories ?
 							naValue :
-							(
-								$this.settings.allowFDARounding ?
-									roundCalories($this.settings.valueFatCalories, $this.settings.decimalPlacesForNutrition) :
-									parseFloat( $this.settings.valueFatCalories.toFixed($this.settings.decimalPlacesForNutrition) )
+                            (
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueFatCalories'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundCalories($this.settings.valueFatCalories, $this.settings.decimalPlacesForNutrition) :
+                                        parseFloat( $this.settings.valueFatCalories.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitFatCalories;
 					nutritionLabel += '</div>\n';
 				}
 
 
 				if ($this.settings.showCalories){
+                    var editable = 'valueCalories' in $this.settings.editable;
 					nutritionLabel += tab2 + '<div>';
 						nutritionLabel += '<b>' + $this.settings.textCalories + '</b> <span itemprop="calories">';
 						nutritionLabel += $this.settings.naCalories ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundCalories($this.settings.valueCalories, $this.settings.decimalPlacesForNutrition) :
-									parseFloat( $this.settings.valueCalories.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueCalories'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundCalories($this.settings.valueCalories, $this.settings.decimalPlacesForNutrition) :
+                                        parseFloat( $this.settings.valueCalories.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitCalories;
 					nutritionLabel += '</span></div>\n';
 				}else if ($this.settings.showFatCalories){
@@ -1214,6 +1274,7 @@
 
 
 			if ($this.settings.showTotalFat){
+                var editable = 'valueTotalFat' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naTotalFat ?
@@ -1240,9 +1301,16 @@
 								$this.settings.naTotalFat ?
 									naValue :
 									(
-										$this.settings.allowFDARounding ?
-											roundFat($this.settings.valueTotalFat, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valueTotalFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valueTotalFat'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundFat($this.settings.valueTotalFat, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valueTotalFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitTotalFat
 							) + '\n';
 				nutritionLabel += tab1 + '</span></div>\n';
@@ -1286,6 +1354,7 @@
 
 
 			if ($this.settings.showTransFat){
+                var editable = 'valueTransFat' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line indent">\n';
 					nutritionLabel += tab2 + $this.settings.textTransFat + ' <span itemprop="transFatContent">';
 						nutritionLabel +=
@@ -1293,9 +1362,16 @@
 								$this.settings.naTransFat ?
 									naValue :
 									(
-										$this.settings.allowFDARounding ?
-											roundFat($this.settings.valueTransFat, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valueTransFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valueTransFat'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundFat($this.settings.valueTransFat, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valueTransFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitTransFat
 							) + '\n';
 				nutritionLabel += tab1 + '</span></div>\n';
@@ -1303,34 +1379,51 @@
 
 
 			if ($this.settings.showPolyFat){
+                var editable = 'valuePolyFat' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line indent">';
 					nutritionLabel += $this.settings.textPolyFat + ' ';
 						nutritionLabel += $this.settings.naPolyFat ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundFat($this.settings.valuePolyFat, $this.settings.decimalPlacesForNutrition) :
-									parseFloat( $this.settings.valuePolyFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valuePolyFat'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundFat($this.settings.valuePolyFat, $this.settings.decimalPlacesForNutrition) :
+                                        parseFloat( $this.settings.valuePolyFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitPolyFat;
 				nutritionLabel += '</div>\n';
 			}
 
 
 			if ($this.settings.showMonoFat){
+                var editable = 'valueMonoFat' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line indent">';
 					nutritionLabel += $this.settings.textMonoFat + ' ';
 						nutritionLabel += $this.settings.naMonoFat ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundFat($this.settings.valueMonoFat, $this.settings.decimalPlacesForNutrition) :
-									parseFloat( $this.settings.valueMonoFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueMonoFat'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundFat($this.settings.valueMonoFat, $this.settings.decimalPlacesForNutrition) :
+                                        parseFloat( $this.settings.valueMonoFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitMonoFat;
 				nutritionLabel += tab1 + '</div>\n';
 			}
 
 
 			if ($this.settings.showCholesterol){
+                var editable = 'valueCholesterol' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naCholesterol ?
@@ -1357,9 +1450,16 @@
 								$this.settings.naCholesterol ?
 									naValue :
 									(
-										$this.settings.allowFDARounding ?
-											roundCholesterol($this.settings.valueCholesterol, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valueCholesterol.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valueCholesterol'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundCholesterol($this.settings.valueCholesterol, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valueCholesterol.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitCholesterol
 							) + '\n';
 				nutritionLabel += tab1 + '</span></div>\n';
@@ -1367,6 +1467,7 @@
 
 
 			if ($this.settings.showSodium){
+                var editable = 'valueSodium' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naSodium ?
@@ -1393,9 +1494,16 @@
 								$this.settings.naSodium ?
 									naValue :
 									(
-										$this.settings.allowFDARounding ?
-											roundSodium($this.settings.valueSodium, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valueSodium.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valueSodium'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundSodium($this.settings.valueSodium, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valueSodium.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitSodium
 							) + '\n';
 				nutritionLabel += tab1 + '</div>\n';
@@ -1403,6 +1511,7 @@
 
 
 			if ($this.settings.showPotassium){
+                var editable = 'valuePotassium' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naPotassium ?
@@ -1429,9 +1538,16 @@
 								$this.settings.naPotassium ?
 									naValue :
 									(
-										$this.settings.allowFDARounding ?
-											roundPotassium($this.settings.valuePotassium, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valuePotassium.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valuePotassium'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundPotassium($this.settings.valuePotassium, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valuePotassium.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitPotassium
 							) + '\n';
 				nutritionLabel += tab1 + '</div>\n';
@@ -1439,6 +1555,7 @@
 
 
 			if ($this.settings.showTotalCarb){
+                var editable = 'valueTotalCarb' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naTotalCarb ?
@@ -1465,9 +1582,16 @@
 								$this.settings.naTotalCarb ?
 									naValue :
 									(
-										$this.settings.allowFDARounding ?
-											roundCarbFiberSugarProtein($this.settings.valueTotalCarb, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valueTotalCarb.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valueTotalCarb'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundCarbFiberSugarProtein($this.settings.valueTotalCarb, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valueTotalCarb.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitTotalCarb
 							) + '\n';
 				nutritionLabel += tab1 + '</span></div>\n';
@@ -1475,6 +1599,7 @@
 
 
 			if ($this.settings.showFibers){
+                var editable = 'valueFibers' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line indent">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naFibers ?
@@ -1498,9 +1623,16 @@
 								$this.settings.naFibers ?
 									naValue :
 									(
-										$this.settings.allowFDARounding ?
-											roundCarbFiberSugarProtein($this.settings.valueFibers, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valueFibers.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valueFibers'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundCarbFiberSugarProtein($this.settings.valueFibers, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valueFibers.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitFibers
 							) + '\n';
 				nutritionLabel += tab1 + '</span></div>\n';
@@ -1508,28 +1640,44 @@
 
 
 			if ($this.settings.showSugars){
+                var editable = 'valueSugars' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line indent">';
 					nutritionLabel += $this.settings.textSugars + ' <span itemprop="sugarContent">';
 						nutritionLabel += $this.settings.naSugars ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundCarbFiberSugarProtein($this.settings.valueSugars, $this.settings.decimalPlacesForNutrition) :
-									parseFloat( $this.settings.valueSugars.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueSugars'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundCarbFiberSugarProtein($this.settings.valueSugars, $this.settings.decimalPlacesForNutrition) :
+                                        parseFloat( $this.settings.valueSugars.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitSugars;
 				nutritionLabel += '</span></div>\n';
 			}
 
 
 			if ($this.settings.showProteins){
+                var editable = 'valueProteins' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line">';
 					nutritionLabel += '<b>' + $this.settings.textProteins + '</b> <span itemprop="proteinContent">';
 						nutritionLabel += $this.settings.naProteins ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundCarbFiberSugarProtein($this.settings.valueProteins, $this.settings.decimalPlacesForNutrition) :
-									parseFloat( $this.settings.valueProteins.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueProteins'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundCarbFiberSugarProtein($this.settings.valueProteins, $this.settings.decimalPlacesForNutrition) :
+                                        parseFloat( $this.settings.valueProteins.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitProteins;
 				nutritionLabel += '</span></div>\n';
 			}
@@ -1539,14 +1687,22 @@
 
 
 			if ($this.settings.showVitaminA){
+                var editable = 'valueVitaminA' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line vitaminA">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naVitaminA ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundVitaminsCalciumIron($this.settings.valueVitaminA) :
-									parseFloat( $this.settings.valueVitaminA.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueVitaminA'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundVitaminsCalciumIron($this.settings.valueVitaminA) :
+                                        parseFloat( $this.settings.valueVitaminA.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitVitaminA;
 					nutritionLabel += '</div>\n';
 
@@ -1556,14 +1712,22 @@
 
 
 			if ($this.settings.showVitaminC){
+                var editable = 'valueVitaminC' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line vitaminC">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naVitaminC ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundVitaminsCalciumIron($this.settings.valueVitaminC) :
-									parseFloat( $this.settings.valueVitaminC.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueVitaminC'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundVitaminsCalciumIron($this.settings.valueVitaminC) :
+                                        parseFloat( $this.settings.valueVitaminC.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitVitaminC;
 					nutritionLabel += '</div>\n';
 
@@ -1573,14 +1737,22 @@
 
 
 			if ($this.settings.showCalcium){
+                var editable = 'valueCalcium' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line calcium">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naCalcium ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundVitaminsCalciumIron($this.settings.valueCalcium) :
-									parseFloat( $this.settings.valueCalcium.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueCalcium'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundVitaminsCalciumIron($this.settings.valueCalcium) :
+                                        parseFloat( $this.settings.valueCalcium.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitCalcium;
 					nutritionLabel += '</div>\n';
 
@@ -1590,14 +1762,22 @@
 
 
 			if ($this.settings.showIron){
+                var editable = 'valueIron' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line iron">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naIron ?
 							naValue :
 							(
-								$this.settings.allowFDARounding ?
-									roundVitaminsCalciumIron($this.settings.valueIron) :
-									parseFloat( $this.settings.valueIron.toFixed($this.settings.decimalPlacesForNutrition) )
+                                (
+                                    editable ?
+                                        '<input class="value" name="' + $this.settings.editable['valueIron'] + '" value="' : ''
+                                ) +
+                                (
+                                    $this.settings.allowFDARounding ?
+                                        roundVitaminsCalciumIron($this.settings.valueIron) :
+                                        parseFloat( $this.settings.valueIron.toFixed($this.settings.decimalPlacesForNutrition) )
+                                ) +
+                                (editable ? '" />' : '')
 							) + $this.settings.unitIron;
 					nutritionLabel += '</div>\n';
 

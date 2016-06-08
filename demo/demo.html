@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==" crossorigin="anonymous">
-	<link rel='stylesheet' type='text/css' media='screen' href='../nutritionLabel-min.css'>
+	<link rel='stylesheet' type='text/css' media='screen' href='../nutritionLabel.css'>
 	<link rel='stylesheet' type='text/css' media='screen' href='./css/demo.css'>
 
 	<!-- google webfont for nutrition label -->
@@ -33,6 +33,7 @@
 				<li><a href="#test18"><i class="icon-chevron-right"></i> Example 18</a></li>
 				<li><a href="#test19"><i class="icon-chevron-right"></i> Example 19</a></li>
 				<li><a href="#test20"><i class="icon-chevron-right"></i> Example 20</a></li>
+				<li><a href="#test21"><i class="icon-chevron-right"></i> Example 21</a></li>
 			</ul>
 		</div>
 		<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -799,12 +800,28 @@ $('#test20').nutritionLabel({
 			</div><br /><br /><br />
 
 
+			<div class="row">
+				<div class="col-md-4">
+					<div id="test21"></div>
+				</div>
+				<div class="col-md-8">
+					<h3>Example #21</h3>
+					<p>Allow editing of all values</p>
+<pre id="pre21">
+$('#test21').nutritionLabel({
+    editable: true
+});
+</pre>
+				</div>
+            </div><br /><br /><br />
+
+
 		</div>
 	</div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-<script type="text/javascript" src="../nutritionLabel-min.js"></script>
+<script type="text/javascript" src="../nutritionLabel.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 	eval( eval( $('#pre1').html() ) );
@@ -827,6 +844,7 @@ $(document).ready(function(){
 	eval( eval( $('#pre18').html() ) );
 	eval( eval( $('#pre19').html() ) );
 	eval( eval( $('#pre20').html() ) );
+	eval( eval( $('#pre21').html() ) );
 });
 </script>
 

@@ -18,7 +18,7 @@
 
 @import url("//fonts.googleapis.com/css?family=Archivo+Black");
 
-.nutritionLabel input.unitQuantityBox.ui-input-text {
+.nutritionLabel input.unitQuantityBox.ui-input-text, .nutritionLabel .name > input.value {
 	margin-top: 0;
 	border-radius: 0;
 	height: auto;
@@ -27,10 +27,13 @@
 	-moz-box-sizing: content-box;
 }
 
-.nutritionLabel input.unitQuantityBox.ui-shadow-inset {
+.nutritionLabel input.unitQuantityBox.ui-shadow-inset, .nutritionLabel .name > input.value {
 	box-shadow: none;
 }
 
+.nutritionLabel .name > input.value {
+    width: 125px;
+}
 
 
 .nutritionLabel {
@@ -173,7 +176,7 @@
 	z-index: 9999;
 }
 
-.nutritionLabel input.unitQuantityBox {
+.nutritionLabel input.unitQuantityBox, .nutritionLabel input.value {
 	width:25px;
 	height: 15px;
 	padding:2px;
@@ -182,7 +185,11 @@
 	margin-bottom: 0;
 	line-height: 15px;
 }
-.nutritionLabel input.unitQuantityBox.arrowsAreHidden {
+.nutritionLabel input.value {
+    width: 30px;
+    text-align: right;
+}
+.nutritionLabel input.unitQuantityBox.arrowsAreHidden, .nutritionLabel input.value {
 	margin-left: 0;
 }
 .nutritionLabel .rel {
