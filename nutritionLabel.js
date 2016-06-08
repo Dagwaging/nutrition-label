@@ -1318,6 +1318,7 @@
 
 
 			if ($this.settings.showSatFat){
+                var editable = 'valueSatFat' in $this.settings.editable;
 				nutritionLabel += tab1 + '<div class="line indent">\n';
 					nutritionLabel += tab2 + '<div class="dv">';
 						nutritionLabel += $this.settings.naSatFat ?
@@ -1343,10 +1344,17 @@
 							(
 								$this.settings.naSatFat ?
 									naValue :
-									(
-										$this.settings.allowFDARounding ?
-											roundFat($this.settings.valueSatFat, $this.settings.decimalPlacesForNutrition) :
-											parseFloat( $this.settings.valueSatFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                    (
+                                        (
+                                            editable ?
+                                                '<input class="value" name="' + $this.settings.editable['valueTotalFat'] + '" value="' : ''
+                                        ) +
+                                        (
+                                            $this.settings.allowFDARounding ?
+                                                roundFat($this.settings.valueSatFat, $this.settings.decimalPlacesForNutrition) :
+                                                parseFloat( $this.settings.valueSatFat.toFixed($this.settings.decimalPlacesForNutrition) )
+                                        ) +
+                                        (editable ? '" />' : '')
 									) + $this.settings.unitSatFat
 							) + '\n';
 				nutritionLabel += tab1 + '</span></div>\n';
