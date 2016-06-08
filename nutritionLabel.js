@@ -1347,7 +1347,7 @@
                                     (
                                         (
                                             editable ?
-                                                '<input class="value" name="' + $this.settings.editable['valueTotalFat'] + '" value="' : ''
+                                                '<input class="value" name="' + $this.settings.editable['valueSatFat'] + '" value="' : ''
                                         ) +
                                         (
                                             $this.settings.allowFDARounding ?
